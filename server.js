@@ -14,6 +14,8 @@ const ORDER_TTL_MS = 30 * 60_000;
 const ZAT = 100_000_000;
 
 const app = express();
+// Behind a TLS proxy: build links with the client-facing scheme and host.
+app.set('trust proxy', true);
 app.use(express.json());
 // The embed button calls the API from other sites.
 app.use('/api', (req, res, next) => {
