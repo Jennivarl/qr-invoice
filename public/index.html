@@ -20,14 +20,21 @@
     .band h2 { font-size: 26px; margin: 0 0 6px; color: #fff; }
     .band p { margin: 0; }
     .band .btn { background: #1b1a1d; color: #fff; padding: 16px 26px; }
-    .activity { margin-top: 18px; }
-    .act { display: flex; align-items: center; gap: 16px; padding: 14px 4px; }
-    .act + .act { border-top: 1px solid var(--line); }
-    .act .ic { width: 52px; height: 52px; border-radius: 50%; background: #1f3a99; color: #8fb1ff; display: grid; place-items: center; flex: none; }
-    .act .ic.priv { background: #4a1217; color: var(--violet-soft); }
-    .act .t { flex: 1; min-width: 0; }
-    .act .t b { display: block; font-weight: 500; font-size: 17px; }
-    .act .amt { color: var(--ok); font-weight: 500; white-space: nowrap; }
+    .ledger { margin-bottom: 14px; padding: 28px; }
+    .lhead { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+    .seg { display: flex; background: var(--bg); border: 1px solid var(--line); border-radius: 99px; padding: 4px; }
+    .seg button { border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 14px; font-weight: 500; padding: 9px 16px; border-radius: 99px; cursor: pointer; }
+    .seg button.on { background: linear-gradient(180deg, var(--tile-top), var(--tile-bottom)); color: var(--ink); box-shadow: inset 0 1px 0 rgba(255,255,255,.06); }
+    .lrow { display: grid; grid-template-columns: 48px 1fr auto; gap: 16px; align-items: center; padding: 16px 0; border-top: 1px solid var(--line); }
+    .lrow .ic { width: 48px; height: 48px; border-radius: 50%; background: var(--card-2); color: var(--muted); display: grid; place-items: center; }
+    .lrow b { display: block; font-weight: 500; font-size: 16px; }
+    .lrow .sub { font-size: 13px; color: var(--muted); }
+    .lrow .amt { font-weight: 500; text-align: right; font-variant-numeric: tabular-nums; }
+    .lrow .amt small { display: block; font-size: 12px; color: var(--muted); font-weight: 400; }
+    .sealed { filter: blur(6px); user-select: none; opacity: .55; }
+    .v-you .ic { background: #1c2a52; color: var(--violet-soft); }
+    .v-eth .exposed { color: #f0b37e; }
+    .lfoot { border-top: 1px solid var(--line); padding-top: 16px; font-size: 14px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
     .feat .card { display: flex; flex-direction: column; gap: 6px; }
     .feat .card .i { color: var(--violet-soft); margin-bottom: 6px; }
     @media (max-width: 720px) {
@@ -60,22 +67,21 @@
       <a class="btn" href="/world/demo">See it</a>
     </div>
 
-    <div class="grid g2">
-      <div class="card">
-        <h2 style="margin-bottom:4px">Activity</h2>
-        <p class="muted small" style="margin:0">How your invoices look to you — example</p>
-        <div class="activity" id="activity"></div>
-      </div>
-      <div class="card">
-        <h2 style="margin-bottom:4px">Same week, on Etherscan</h2>
-        <p class="muted small" style="margin:0">What anyone sees if you're paid in public stablecoins — example</p>
-        <div class="activity">
-          <div class="act"><span class="ic" style="background:#3a1a18;color:var(--bad)">!</span><span class="t"><b>Acme DAO Treasury → 0xanon</b><span class="small muted">Tagged: contributor</span></span><span class="amt" style="color:var(--bad)">12,000 USDC</span></div>
-          <div class="act"><span class="ic" style="background:#3a1a18;color:var(--bad)">!</span><span class="t"><b>0xanon → exchange deposit</b><span class="small muted">Linked to a verified account</span></span><span class="amt" style="color:var(--bad)">9,500 USDC</span></div>
-          <div class="act"><span class="ic" style="background:#3a1a18;color:var(--bad)">!</span><span class="t"><b>0xanon balance</b><span class="small muted">Visible to anyone, forever</span></span><span class="amt" style="color:var(--bad)">$84,200</span></div>
+    <section class="card ledger">
+      <div class="lhead">
+        <div>
+          <h2 style="margin:0">Same payments. Three ledgers.</h2>
+          <p class="muted small" style="margin:4px 0 0">One week of contributor income, example data</p>
+        </div>
+        <div class="seg" id="seg">
+          <button data-v="you" class="on">You</button>
+          <button data-v="zec">Zcash explorer</button>
+          <button data-v="eth">Etherscan</button>
         </div>
       </div>
-    </div>
+      <div id="rows"></div>
+      <div class="lfoot" id="lfoot"></div>
+    </section>
 
     <div class="grid g3 feat" style="margin-top:14px">
       <div class="card"><span class="i" data-icon="shield"></span><h3>Invisible onchain</h3><p class="muted small" style="margin:0">Sender, receiver, amount and memo are encrypted on Zcash. Explorers see that something happened — nothing more.</p></div>
@@ -97,11 +103,29 @@
     ].map(([i, b, s]) => `<div class="tile">${ICON[i]}<b>${b}</b><span>${s}</span></div>`).join('');
     document.getElementById('bandIcon').innerHTML = ICON.eye.replace('width="26" height="26"', 'width="40" height="40"');
     document.querySelectorAll('[data-icon]').forEach((el) => (el.innerHTML = ICON[el.dataset.icon]));
-    document.getElementById('activity').innerHTML = [
-      ['Audit: v4 hook', 'Acme DAO · shielded', '+0.4 ZEC'],
-      ['Bounty #142', 'Paid in USDC on Base → ZEC', '+0.08 ZEC'],
-      ['Grant milestone 2', 'Retainer · cycle 3', '+0.25 ZEC'],
-    ].map(([b, s, a]) => `<div class="act"><span class="ic priv">${ICON.receive}</span><span class="t"><b>${b}</b><span class="small muted">${s}</span></span><span class="amt">${a}</span></div>`).join('');
+    const LEDGER = [
+      { item: 'Audit: v4 hook', from: 'Acme DAO', zec: '0.40', usd: '12,000', eth: 'Acme DAO Treasury (Safe)' },
+      { item: 'Bounty #142', from: 'Paid in USDC on Base', zec: '0.08', usd: '2,400', eth: 'Bounty multisig 0x9f3c…e21a' },
+      { item: 'Grant milestone 2', from: 'Retainer · cycle 3', zec: '0.25', usd: '7,500', eth: 'Ecosystem grants 0x41d0…77b2' },
+    ];
+    const FOOT = {
+      you: ['Total received <b>0.73 ZEC</b>', 'Decrypted with your viewing key'],
+      zec: ['<b>3 shielded transactions</b>', 'No senders, receivers, amounts or memos'],
+      eth: ['<b class="exposed">0xanon.eth received 21,900 USDC</b>', 'Then moved to an exchange deposit linked to a verified account'],
+    };
+    function ledger(v) {
+      const rows = document.getElementById('rows');
+      rows.className = 'v-' + v;
+      rows.innerHTML = LEDGER.map((r) => {
+        if (v === 'you') return `<div class="lrow"><span class="ic">${ICON.receive}</span><span><b>${r.item}</b><span class="sub">${r.from}</span></span><span class="amt">+${r.zec} ZEC<small>shielded</small></span></div>`;
+        if (v === 'zec') return `<div class="lrow"><span class="ic">${ICON.shield}</span><span><b>Shielded transaction</b><span class="sub sealed">${r.from} → you</span></span><span class="amt"><span class="sealed">${r.zec} ZEC</span><small>encrypted</small></span></div>`;
+        return `<div class="lrow"><span class="ic">${ICON.eye}</span><span><b class="exposed">${r.eth} → 0xanon.eth</b><span class="sub">Tagged: contributor · ${r.item}</span></span><span class="amt exposed">${r.usd} USDC<small>public forever</small></span></div>`;
+      }).join('');
+      document.getElementById('lfoot').innerHTML = `<span>${FOOT[v][0]}</span><span class="muted">${FOOT[v][1]}</span>`;
+      document.querySelectorAll('#seg button').forEach((b) => b.classList.toggle('on', b.dataset.v === v));
+    }
+    document.getElementById('seg').onclick = (e) => e.target.dataset.v && ledger(e.target.dataset.v);
+    ledger('you');
   </script>
 </body>
 </html>

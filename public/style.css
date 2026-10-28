@@ -2,21 +2,21 @@
 
 :root {
   color-scheme: dark;
-  --bg: #19181b;
-  --card: #232226;
-  --card-2: #2b2a2e;
-  --tile-top: #343337;
-  --tile-bottom: #29282c;
+  --bg: #111317;
+  --card: #181b21;
+  --card-2: #20242b;
+  --tile-top: #242932;
+  --tile-bottom: #1b1f26;
   --ink: #f5f4f7;
-  --muted: #9b99a1;
-  --line: #333236;
-  --violet: #a3202b;
-  --violet-2: #5c0f15;
-  --violet-soft: #f3a6aa;
-  --band: linear-gradient(180deg, #8f1a24 0%, #5c0f15 100%);
-  --zec: #a3202b;
+  --muted: #8d94a3;
+  --line: #262b33;
+  --violet: #3d6bff;
+  --violet-2: #1b2f6b;
+  --violet-soft: #9db8ff;
+  --band: linear-gradient(135deg, #22356f 0%, #172447 55%, #121a33 100%);
+  --zec: #3d6bff;
   --zec-ink: #ffffff;
-  --ok: #7fe0a8;
+  --ok: #8fd6b0;
   --ok-bg: #173225;
   --warn: #f3c56b;
   --warn-bg: #362b14;
@@ -58,8 +58,8 @@ h3 { font-size: 18px; margin: 0 0 6px; letter-spacing: -0.01em; font-weight: 600
 /* Surfaces */
 .card { background: var(--card); border-radius: var(--radius); padding: 26px; }
 .card.white { background: var(--card); border: 1px solid var(--line); }
-.card.dark, .band { background: var(--band); color: #fff; border: 0; }
-.card.dark .muted, .band .muted { color: #f1cfd1; }
+.card.dark, .band { background: var(--band); color: #fff; border: 1px solid #2a3b70; }
+.card.dark .muted, .band .muted { color: #b9c6e6; }
 .grid { display: grid; gap: 14px; }
 .g3 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
 .g2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
@@ -68,7 +68,7 @@ h3 { font-size: 18px; margin: 0 0 6px; letter-spacing: -0.01em; font-weight: 600
 /* Buttons: Zodl-style tiles and pills */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #fff; color: #111; border: 0; border-radius: 99px; padding: 15px 26px; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; text-decoration: none; transition: transform .12s ease, filter .12s; }
 .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
-.btn.zec { background: var(--band); color: #fff; box-shadow: 0 8px 24px -10px rgba(143, 26, 36, .75); }
+.btn.zec { background: linear-gradient(180deg, #4874ff, #2f56d6); color: #fff; box-shadow: 0 8px 24px -10px rgba(61, 107, 255, .55); }
 .btn.ghost { background: linear-gradient(180deg, var(--tile-top), var(--tile-bottom)); color: var(--ink); box-shadow: inset 0 1px 0 rgba(255,255,255,.06); }
 .btn:disabled { opacity: .5; cursor: default; transform: none; }
 
