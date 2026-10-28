@@ -7,7 +7,7 @@ const BRAND = 'QR Invoice';
   const links = [['/dashboard', 'Invoices'], ['/embed', 'Embed'], ['/how', 'How it works']];
   el.className = 'top wrap';
   el.innerHTML = `
-    <a class="brand" href="/"><span class="mark">▦</span>${BRAND}</a>
+    <a class="brand" href="/"><span class="mark">▦</span>QR<span class="light">invoice</span></a>
     <nav>${links.map(([h, t]) => `<a href="${h}" class="${here.startsWith(h) ? 'on' : ''}">${t}</a>`).join('')}</nav>`;
   document.title = document.title ? `${document.title} · ${BRAND}` : BRAND;
 })();

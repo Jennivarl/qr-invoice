@@ -7,14 +7,15 @@
   <link rel="stylesheet" href="/style.css">
   <style>
     .flow { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin: 8px 0 40px; }
-    .flow .card { padding: 18px; }
-    .flow .n { width: 26px; height: 26px; border-radius: 50%; background: var(--zec); color: var(--zec-ink); display: grid; place-items: center; font-weight: 800; font-size: 13px; margin-bottom: 8px; }
+    .flow .card { padding: 20px; }
+    .flow .n { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; color: var(--muted); margin-bottom: 10px; } .flow .n b { background: var(--zec); color: var(--zec-ink); border-radius: 5px; padding: 1px 6px; margin-right: 6px; }
   </style>
 </head>
 <body>
   <header id="top"></header>
   <main class="wrap">
-    <h1 style="max-width:860px">Your wallet is your bank statement.<br><span class="muted">Stop publishing it.</span></h1>
+    <div class="tag" style="margin-top:28px">ZEC · SHIELDED</div>
+    <h1 style="max-width:900px">Your wallet is your <span class="hl">bank statement.</span><br>Stop publishing it.</h1>
     <p class="muted" style="max-width:660px;font-size:18px">Private invoice links for crypto freelancers, anon devs and contributors. DAOs, protocols and clients pay in ZEC — or USDC from any chain. You receive <b>shielded ZEC</b>. Etherscan, Arkham and your next client can't see who pays you or how much you make.</p>
     <div class="row" style="margin:24px 0 36px">
       <a class="btn zec" href="/dashboard">Create an invoice</a>
@@ -23,15 +24,15 @@
     </div>
 
     <div class="flow">
-      <div class="card"><div class="n">1</div><b>Create a link</b><p class="muted small" style="margin:4px 0 0">"Audit: v4 hook — 0.01 ZEC." Every invoice gets its own private shielded address.</p></div>
-      <div class="card"><div class="n">2</div><b>Client pays</b><p class="muted small" style="margin:4px 0 0">In shielded ZEC from Zodl, or USDC on Base, Ethereum, Arbitrum or Solana — from a Safe, a wallet or an agent.</p></div>
-      <div class="card"><div class="n">3</div><b>Lands shielded</b><p class="muted small" style="margin:4px 0 0">USDC is swapped on the way. Everything arrives in your shielded Zcash wallet.</p></div>
-      <div class="card"><div class="n">4</div><b>Marked paid</b><p class="muted small" style="margin:4px 0 0">Your viewing key spots it and the invoice flips to Paid ✓ on its own.</p></div>
+      <div class="card"><div class="n"><b>1</b>STEP ONE</div><b>Create a link</b><p class="muted small" style="margin:4px 0 0">"Audit: v4 hook — 0.01 ZEC." Every invoice gets its own private shielded address.</p></div>
+      <div class="card"><div class="n"><b>2</b>STEP TWO</div><b>Client pays</b><p class="muted small" style="margin:4px 0 0">In shielded ZEC from Zodl, or USDC on Base, Ethereum, Arbitrum or Solana — from a Safe, a wallet or an agent.</p></div>
+      <div class="card"><div class="n"><b>3</b>STEP THREE</div><b>Lands shielded</b><p class="muted small" style="margin:4px 0 0">USDC is swapped on the way. Everything arrives in your shielded Zcash wallet.</p></div>
+      <div class="card"><div class="n"><b>4</b>STEP FOUR</div><b>Marked paid</b><p class="muted small" style="margin:4px 0 0">Your viewing key spots it and the invoice flips to Paid ✓ on its own.</p></div>
     </div>
 
-    <div class="card" style="margin-bottom:16px">
-      <h2>gm, you're doxxed</h2>
-      <p class="muted" style="margin:0">Get paid from a DAO treasury and it's on Etherscan forever: who paid you, how much, how often, and every wallet you move it to. Your anon handle gets linked to your income, clients see your rates, and anyone hunting for a target sees your balance. With QR Invoice, payers send to a one-time address and the money settles in Zcash's shielded pool. Your income stays yours.</p>
+    <div class="card dark" style="margin-bottom:16px;padding:32px">
+      <h2 style="font-size:32px">gm, you're <span class="hl">doxxed.</span></h2>
+      <p class="muted" style="margin:0;font-size:17px">Get paid from a DAO treasury and it's on Etherscan forever: who paid you, how much, how often, and every wallet you move it to. Your anon handle gets linked to your income, clients see your rates, and anyone hunting for a target sees your balance. With QR Invoice, payers send to a one-time address and the money settles in Zcash's shielded pool. Your income stays yours.</p>
     </div>
 
     <div class="grid g3">
