@@ -1,0 +1,11 @@
+# Same as Dockerfile, but reuses an already-built zcash-devtool image (tag: zdt).
+FROM node:24-bookworm-slim
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+COPY --from=zdt /usr/local/bin/zcash-devtool /usr/local/bin/zcash-devtool
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm install --omit=dev
+COPY . .
+ENV DATA_DIR=/data WALLET_DIR=/data/wallet PORT=3000
+EXPOSE 3000
+CMD ["sh", "scripts/start.sh"]

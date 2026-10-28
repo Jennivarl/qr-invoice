@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Embed</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>pre { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 14px; overflow-x: auto; font-size: 13px; }</style>
+</head>
+<body>
+  <header id="top"></header>
+  <main class="wrap">
+    <h1>One line on any website</h1>
+    <p class="muted">Portfolio site, Notion page, GitHub Pages — paste this line and clients pay privately in a pop-up checkout.</p>
+    <pre id="code"></pre>
+
+    <h2 style="margin-top:32px">Try it</h2>
+    <div class="card" style="max-width:520px">
+      <h3>1-hour smart contract review call</h3>
+      <p class="muted small">A pretend anon-dev portfolio using the embed.</p>
+      <div id="slot"></div>
+      <p id="thanks" class="small" style="color:var(--ok)"></p>
+    </div>
+  </main>
+  <script src="/common.js"></script>
+  <script>
+    const tag = `<script src="${location.origin}/button.js" data-label="Contract review call" data-amount="0.001"><\/script>`;
+    document.getElementById('code').textContent = tag;
+    const s = document.createElement('script');
+    s.src = '/button.js'; s.dataset.label = 'Contract review call'; s.dataset.amount = '0.001';
+    document.getElementById('slot').appendChild(s);
+    document.addEventListener('zec-paid', () => (document.getElementById('thanks').textContent = 'Paid — check your email for the booking link.'));
+  </script>
+</body>
+</html>

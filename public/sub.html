@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Subscription</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header id="top"></header>
+  <main class="wrap">
+    <div class="card" style="max-width:520px;margin:28px auto" id="box"><p class="muted">Loading…</p></div>
+  </main>
+  <script src="/common.js"></script>
+  <script>
+    const id = location.pathname.split('/').pop();
+    async function load() {
+      const s = await api(`/api/subscriptions/${id}`);
+      const cur = s.current_order;
+      const owe = cur && cur.status !== 'paid';
+      document.getElementById('box').innerHTML = `
+        <div class="muted small">Recurring invoice</div>
+        <h2 style="margin:4px 0">${esc(s.plan)}</h2>
+        <p><span class="pill ${s.state}">${s.state}</span> &nbsp; ${s.amount} ZEC every ${Math.round(s.interval_ms / 60000)} min (demo)</p>
+        <p class="muted small">Hi ${esc(s.customer)}. Each cycle you get a fresh private invoice. Nothing is ever pulled from your wallet — you approve every payment.</p>
+        <p>Paid cycles: <b>${s.paid_cycles}</b> of ${s.cycles}</p>
+        ${owe ? `<a class="btn zec" href="/pay/${cur.id}" style="width:100%">Pay this cycle — ${cur.amount} ZEC</a>`
+              : `<p class="muted">You're all paid up. Next invoice ${new Date(s.next_due).toLocaleTimeString()}.</p>`}`;
+    }
+    load().catch(() => (document.getElementById('box').innerHTML = '<p>Subscription not found.</p>'));
+    setInterval(() => load().catch(() => {}), 5000);
+  </script>
+</body>
+</html>

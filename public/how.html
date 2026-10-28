@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How it works</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>ol li { margin: 10px 0; } .card { margin-top: 16px; }</style>
+</head>
+<body>
+  <header id="top"></header>
+  <main class="wrap" style="max-width:760px">
+    <h1>How it works</h1>
+    <div class="card">
+      <ol>
+        <li><b>Order created.</b> The server derives a fresh shielded address for this order from the merchant's viewing key, then builds a <a href="https://zips.z.cash/zip-0321">ZIP 321</a> payment request (address, amount, memo) shown as a QR code.</li>
+        <li><b>Client pays.</b> Any shielded wallet (e.g. Zodl) scans the QR and sends — sender, receiver, amount and memo are encrypted on-chain. Or they pay <b>USDC on Base</b>: NEAR Intents gives a one-time deposit address and delivers ZEC to the invoice's shielded address. On Base it's a payment to a throwaway address, not to you.</li>
+        <li><b>Server detects it.</b> Every few seconds the server syncs compact blocks from a public lightwalletd and trial-decrypts them with the viewing key. A note landing on the order's address marks it paid.</li>
+        <li><b>Invoice flips to Paid ✓.</b> The invoice page, dashboard, recurring invoices and embed button all update live.</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3>Keys</h3>
+      <p class="muted">Your seed never touches the server. The server is initialised from a <b>Unified Full Viewing Key</b> — enough to see and confirm incoming payments, impossible to spend with.</p>
+      <h3 style="margin-top:16px">Built on</h3>
+      <p class="muted">zcash-devtool (librustzcash wallet backend) · lightwalletd · Sapling, Orchard &amp; Ironwood shielded pools · NEAR Intents 1Click · Node.js</p>
+    </div>
+  </main>
+  <script src="/common.js"></script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Invoices</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .stat .n { font-size: 28px; font-weight: 700; }
+    section { margin-top: 28px; }
+  </style>
+</head>
+<body>
+  <header id="top"></header>
+  <main class="wrap">
+    <div class="row" style="justify-content:space-between;margin-top:20px">
+      <div>
+        <h1 style="margin:0">Invoices</h1>
+        <p class="muted small" id="sync" style="margin:6px 0 0"></p>
+      </div>
+      <a class="btn ghost" href="/api/export.csv">Export for accountant (CSV)</a>
+    </div>
+
+    <div class="grid g3" style="margin-top:20px">
+      <div class="card stat"><div class="muted small">Received</div><div class="n" id="total">—</div></div>
+      <div class="card stat"><div class="muted small">Paid invoices</div><div class="n" id="count">—</div></div>
+      <div class="card stat"><div class="muted small">Active retainers</div><div class="n" id="subs">—</div></div>
+    </div>
+
+    <section class="card">
+      <h2>New invoice</h2>
+      <div class="grid g3">
+        <div><label for="lbl">What for</label><input id="lbl" placeholder="Audit: v4 hook — Acme DAO"></div>
+        <div><label for="amt">Amount (ZEC)</label><input id="amt" placeholder="0.002" inputmode="decimal"></div>
+        <div><label for="every">Repeat</label><select id="every"><option value="">One-time</option><option value="10">Monthly (demo: every 10 min)</option></select></div>
+      </div>
+      <div class="row" style="margin-top:14px"><button class="btn zec" id="mk">Create invoice link</button><span class="muted small">Payers can use ZEC, or USDC on Base, Ethereum, Arbitrum or Solana (invoices ≥ 0.001 ZEC).</span>
+      </div>
+      <p class="mono" id="link" style="margin:12px 0 0"></p>
+    </section>
+
+    <section class="card">
+      <h2>All invoices</h2>
+      <div class="table-scroll"><table>
+        <thead><tr><th>When</th><th>Item</th><th>Amount</th><th>Status</th><th>Memo</th><th>Tx</th></tr></thead>
+        <tbody id="orders"></tbody>
+      </table></div>
+    </section>
+
+    <section class="card">
+      <h2>Recurring</h2>
+      <div class="table-scroll"><table>
+        <thead><tr><th>Client</th><th>Plan</th><th>Per cycle</th><th>Paid cycles</th><th>Status</th><th>Current invoice</th></tr></thead>
+        <tbody id="subsTable"></tbody>
+      </table></div>
+    </section>
+
+    <section class="card">
+      <h2>Your keys</h2>
+      <p class="muted">This server holds a <b>viewing key</b> only. It can see incoming payments and their memos so it can confirm orders — it cannot move a single zatoshi. Your spending key stays in your own wallet.</p>
+    </section>
+  </main>
+  <footer class="wrap">Who pays you never touches a public ledger.</footer>
+  <script src="/common.js"></script>
+  <script>
+    async function load() {
+      const [orders, subs, st] = await Promise.all([api('/api/orders'), api('/api/subscriptions'), api('/api/status')]);
+      const paid = orders.filter((o) => o.status === 'paid');
+      document.getElementById('total').textContent = `${paid.reduce((s, o) => s + Number(o.paid), 0).toFixed(4)} ZEC`;
+      document.getElementById('count').textContent = paid.length;
+      document.getElementById('subs').textContent = subs.filter((s) => s.state === 'active').length;
+      document.getElementById('sync').innerHTML = st.ok
+        ? `<span class="dot live"></span>&nbsp; Live · block ${st.tip ?? '…'} · checked ${ago(st.at)}`
+        : `<span class="dot"></span>&nbsp; ${st.at ? 'Sync error — retrying' : 'Starting…'}`;
+      document.getElementById('orders').innerHTML = orders.map((o) => {
+        const expired = o.status === 'pending' && Date.now() > o.expires_at;
+        const status = expired ? 'expired' : o.status;
+        return `<tr>
+          <td>${ago(o.created_at)}</td>
+          <td><a href="/pay/${o.id}">${esc(o.label)}</a></td>
+          <td>${o.status === 'pending' ? o.amount : o.paid} ZEC</td>
+          <td><span class="pill ${status}">${status}</span></td>
+          <td class="small">${esc(o.memo || '')}</td>
+          <td class="mono">${o.txid ? `<a href="/world/${o.id}">${short(o.txid, 6)}</a>` : ''}</td>
+        </tr>`;
+      }).join('') || '<tr><td colspan="6" class="muted">No invoices yet. Create one above.</td></tr>';
+      document.getElementById('subsTable').innerHTML = subs.map((s) => `<tr>
+          <td>${esc(s.customer)}</td><td>${esc(s.plan)}</td><td>${s.amount} ZEC</td>
+          <td>${s.paid_cycles} / ${s.cycles}</td>
+          <td><span class="pill ${s.state}">${s.state}</span></td>
+          <td>${s.current_order ? `<a href="/pay/${s.current_order.id}">${s.current_order.status === 'paid' ? 'paid' : 'pay link'}</a>` : ''}</td>
+        </tr>`).join('') || '<tr><td colspan="6" class="muted">No recurring invoices yet.</td></tr>';
+    }
+    document.getElementById('mk').onclick = async (e) => {
+      e.target.disabled = true;
+      try {
+        const label = document.getElementById('lbl').value.trim();
+        const amount = document.getElementById('amt').value.trim();
+        const every = document.getElementById('every').value;
+        const url = every
+          ? (await api('/api/subscriptions', { customer: label, plan: label, amount, interval_min: Number(every) })).sub_url
+          : (await api('/api/orders', { label, amount, source: 'link' })).pay_url;
+        document.getElementById('link').innerHTML = `<a href="${url}" target="_blank">${url}</a> &nbsp;<button class="btn ghost" onclick="navigator.clipboard.writeText('${url}')">Copy</button>`;
+        load();
+      } catch (err) { alert(err.message); }
+      e.target.disabled = false;
+    };
+    load(); setInterval(load, 5000);
+  </script>
+</body>
+</html>

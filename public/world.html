@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What the world sees</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .cols { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-top: 20px; }
+    .k { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; margin-top: 12px; }
+    .v { font-weight: 600; word-break: break-all; }
+    .hidden { font-family: var(--mono); color: var(--muted); letter-spacing: .1em; }
+    .leak { color: var(--bad); }
+    .tag { font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 99px; display: inline-block; }
+    .tag.you { background: var(--ok-bg); color: var(--ok); }
+    .tag.world { background: var(--line); color: var(--ink); }
+    .tag.public { background: var(--bad-bg); color: var(--bad); }
+  </style>
+</head>
+<body>
+  <header id="top"></header>
+  <main class="wrap">
+    <h1>What Arkham sees.</h1>
+    <p class="muted" style="max-width:680px">Every DAO payout is a public label waiting to happen: who paid you, how much, and where it went next. Here's the same invoice three ways.</p>
+    <div class="cols" id="cols"><p class="muted">Loading…</p></div>
+  </main>
+  <footer class="wrap" id="foot"></footer>
+  <script src="/common.js"></script>
+  <script>
+    const id = location.pathname.split('/').pop();
+    (async () => {
+      // The demo uses a real shielded mainnet payment made with this app.
+      const o = id === 'demo'
+        ? { label: 'Audit: v4 hook', paid: '0.0002', memo: 'Invoice 0c4a56b24c', status: 'paid', txid: 'd263db0025b222a33f1a2c50e1f02923d75b09fb90c86bf074cd408bfb8a1da3' }
+        : await api(`/api/orders/${id}`);
+      const usd = (n) => Number(n).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+      const hid = '<span class="hidden">●●●●●● encrypted</span>';
+      const fakeAddr = (seed) => '0x' + [...seed].map((c) => c.charCodeAt(0).toString(16)).join('').padEnd(40, '7a').slice(0, 40);
+      document.getElementById('cols').innerHTML = `
+        <div class="card">
+          <span class="tag you">You see</span>
+          <div class="k">Item</div><div class="v">${esc(o.label)}</div>
+          ${o.value_usd ? `<div class="k">Value</div><div class="v">${usd(o.value_usd)}</div>` : ''}
+          <div class="k">Amount</div><div class="v">${o.paid} ZEC</div>
+          <div class="k">Memo</div><div class="v">${esc(o.memo || '—')}</div>
+          <div class="k">Status</div><div class="v"><span class="pill ${o.status}">${o.status}</span></div>
+          <p class="small muted" style="margin-top:14px">Decrypted with your viewing key. Nobody else has it.</p>
+        </div>
+        <div class="card">
+          <span class="tag world">The world sees · Zcash</span>
+          <div class="k">Transaction</div><div class="v mono">${o.txid ? esc(o.txid) : '—'}</div>
+          <div class="k">Sender</div><div class="v">${hid}</div>
+          <div class="k">Receiver</div><div class="v">${hid}</div>
+          <div class="k">Amount</div><div class="v">${hid}</div>
+          <div class="k">Memo</div><div class="v">${hid}</div>
+          ${o.txid ? `<p style="margin-top:14px"><a class="btn ghost" target="_blank" rel="noopener" href="https://mainnet.zcashexplorer.app/transactions/${o.txid}">Check it on a public explorer ↗</a></p>` : ''}
+        </div>
+        <div class="card">
+          <span class="tag public">The same invoice paid on Ethereum</span>
+          <div class="k">From</div><div class="v leak">DAO Treasury (Safe) <span class="mono small">${fakeAddr('treasury')}</span></div>
+          <div class="k">To</div><div class="v leak">0xanon <span class="mono small">${fakeAddr('anon')}</span> · tagged <i>Contributor</i></div>
+          <div class="k">Amount</div><div class="v leak">${esc(o.label)} — 12,000 USDC</div>
+          <div class="k">Anyone can now see</div>
+          <div class="v leak">Total received from DAOs: $84,200. Every client, your rate, your balance, and the CEX you cash out to — enough to link 0xanon to a real name.</div>
+          <p class="small muted" style="margin-top:14px">Illustration of what block explorers and analytics tools show for a typical transparent payment.</p>
+        </div>`;
+    })().catch(() => { document.getElementById('cols').innerHTML = '<p>Order not found.</p>'; });
+  </script>
+</body>
+</html>

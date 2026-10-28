@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .flow { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin: 8px 0 40px; }
+    .flow .card { padding: 18px; }
+    .flow .n { width: 26px; height: 26px; border-radius: 50%; background: var(--zec); color: var(--zec-ink); display: grid; place-items: center; font-weight: 800; font-size: 13px; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <header id="top"></header>
+  <main class="wrap">
+    <h1 style="max-width:860px">Your wallet is your bank statement.<br><span class="muted">Stop publishing it.</span></h1>
+    <p class="muted" style="max-width:660px;font-size:18px">Private invoice links for crypto freelancers, anon devs and contributors. DAOs, protocols and clients pay in ZEC — or USDC from any chain. You receive <b>shielded ZEC</b>. Etherscan, Arkham and your next client can't see who pays you or how much you make.</p>
+    <div class="row" style="margin:24px 0 36px">
+      <a class="btn zec" href="/dashboard">Create an invoice</a>
+      <a class="btn ghost" href="/world/demo">See what Arkham sees</a>
+      <a class="btn ghost" href="/how">How it works</a>
+    </div>
+
+    <div class="flow">
+      <div class="card"><div class="n">1</div><b>Create a link</b><p class="muted small" style="margin:4px 0 0">"Audit: v4 hook — 0.01 ZEC." Every invoice gets its own private shielded address.</p></div>
+      <div class="card"><div class="n">2</div><b>Client pays</b><p class="muted small" style="margin:4px 0 0">In shielded ZEC from Zodl, or USDC on Base, Ethereum, Arbitrum or Solana — from a Safe, a wallet or an agent.</p></div>
+      <div class="card"><div class="n">3</div><b>Lands shielded</b><p class="muted small" style="margin:4px 0 0">USDC is swapped on the way. Everything arrives in your shielded Zcash wallet.</p></div>
+      <div class="card"><div class="n">4</div><b>Marked paid</b><p class="muted small" style="margin:4px 0 0">Your viewing key spots it and the invoice flips to Paid ✓ on its own.</p></div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <h2>gm, you're doxxed</h2>
+      <p class="muted" style="margin:0">Get paid from a DAO treasury and it's on Etherscan forever: who paid you, how much, how often, and every wallet you move it to. Your anon handle gets linked to your income, clients see your rates, and anyone hunting for a target sees your balance. With QR Invoice, payers send to a one-time address and the money settles in Zcash's shielded pool. Your income stays yours.</p>
+    </div>
+
+    <div class="grid g3">
+      <div class="card"><h3>Revenue nobody can read</h3><p class="muted small">Sender, receiver, amount and memo are encrypted on Zcash. A block explorer sees that <i>something</i> happened — nothing more.</p></div>
+      <div class="card"><h3>DAOs pay how they like</h3><p class="muted small">Shielded ZEC directly, or USDC from Base, Ethereum, Arbitrum or Solana via NEAR Intents — swapped and delivered to the invoice's shielded address.</p></div>
+      <div class="card"><h3>Bots and agents can pay too</h3><p class="muted small">A USDC invoice is just an address and an amount — a treasury bot or AI agent can settle it, and you still get paid privately.</p></div>
+      <div class="card"><h3>Server can't spend</h3><p class="muted small">The server holds a viewing key only. It sees payments, never moves them. A hacked server leaks no funds.</p></div>
+      <div class="card"><h3>Retainers and streams</h3><p class="muted small">Monthly contributor retainers with a fresh private invoice each cycle. Nothing is ever pulled from the payer's wallet.</p></div>
+      <div class="card"><h3>Clean books</h3><p class="muted small">One-click CSV for your tax guy. Private onchain — not from the taxman.</p></div>
+    </div>
+  </main>
+  <footer class="wrap">Open source · Built for Zecathon 2026 · Shielded Payments track</footer>
+  <script src="/common.js"></script>
+</body>
+</html>

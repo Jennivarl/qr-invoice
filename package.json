@@ -1,0 +1,19 @@
+{
+  "name": "qr-invoice",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Private invoice links. Clients pay in ZEC or USDC; you receive shielded ZEC.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "qrcode": "^1.5.4"
+  },
+  "license": "MIT"
+}

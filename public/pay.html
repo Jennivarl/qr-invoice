@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Checkout</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .pay { max-width: 460px; margin: 24px auto; text-align: center; }
+    .qr { width: 260px; height: 260px; border-radius: 12px; background: #fff; padding: 8px; margin: 16px auto; display: block; }
+    .addr { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px; text-align: left; }
+    .steps { text-align: left; margin: 18px 0 0; padding: 0; list-style: none; }
+    .steps li { display: flex; gap: 10px; align-items: center; padding: 6px 0; color: var(--muted); }
+    .steps li.done { color: var(--ink); }
+    .steps li .b { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-size: 12px; flex: none; }
+    .steps li.done .b { background: var(--ok); border-color: var(--ok); color: #fff; }
+    .steps li.now .b { border-color: var(--zec); animation: pulse 1.4s infinite; }
+    @keyframes pulse { 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--zec) 30%, transparent); } }
+    .paid-mark { width: 96px; height: 96px; border-radius: 50%; background: var(--ok); color: #fff; font-size: 54px; display: grid; place-items: center; margin: 12px auto; animation: pop .4s ease-out; }
+    @keyframes pop { from { transform: scale(.4); opacity: 0; } }
+    .hide { display: none !important; }
+    .tabs { display: flex; gap: 6px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 4px; margin-top: 14px; }
+    .tab { flex: 1; border: 0; background: transparent; color: var(--muted); font: inherit; font-weight: 600; padding: 8px; border-radius: 9px; cursor: pointer; }
+    .tab.on { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  </style>
+</head>
+<body>
+  <header id="top"></header>
+  <main class="wrap">
+    <div class="card pay" id="box">
+      <p class="muted">Loading…</p>
+    </div>
+  </main>
+  <script src="/common.js"></script>
+  <script>
+    const id = location.pathname.split('/').pop();
+    const params = new URLSearchParams(location.search);
+    if (params.get('embed')) document.getElementById('top').remove();
+    let rendered = false;
+
+    function renderWaiting(o) {
+      const box = document.getElementById('box');
+      box.innerHTML = `
+        <div class="muted small">Pay privately</div>
+        <h2 style="margin:4px 0 0">${esc(o.label)}</h2>
+        <div class="price" style="margin-top:6px">${o.amount} <small>ZEC</small></div>
+        <div class="tabs">
+          <button class="tab on" data-pane="zecPane">Pay with ZEC</button>
+          <button class="tab" data-pane="usdcPane">Pay with USDC</button>
+        </div>
+        <div id="zecPane">
+        <img class="qr" id="qr" src="${o.qr}" alt="Payment QR code">
+        <button class="btn ghost small" id="alt" style="margin-bottom:12px">Wallet won't scan? Show address-only QR</button>
+        <a class="btn zec" href="${esc(o.uri)}" style="width:100%">Open in wallet</a>
+        <p class="muted small" style="margin:14px 0 6px">Scan with Zodl or any shielded Zcash wallet. This address is unique to this order.</p>
+        <div class="addr mono" id="addr">${esc(o.address)}</div>
+        <div class="row" style="justify-content:center;margin-top:8px">
+          <button class="btn ghost" id="copy">Copy address</button>
+        </div>
+        </div>
+        <div id="usdcPane" class="hide" style="text-align:left">
+          <p class="small muted" style="margin:16px 0 0">No ZEC? Pay in USDC from any wallet — a DAO Safe, MetaMask, Phantom, or an AI agent. It's swapped on the way and lands in the freelancer's <b>shielded</b> Zcash wallet. Onchain it looks like a payment to a one-time address, not to them.</p>
+          <div id="usdcBox">
+            <label for="chain">Pay from</label>
+            <select id="chain">
+              <option value="base">USDC on Base</option>
+              <option value="eth">USDC on Ethereum</option>
+              <option value="arb">USDC on Arbitrum</option>
+              <option value="sol">USDC on Solana</option>
+            </select>
+            <label for="refund">Your wallet address on that chain (only used for refunds)</label>
+            <input id="refund" placeholder="0x… or Solana address" autocomplete="off">
+            <button class="btn zec" id="usdcGo" style="width:100%;margin-top:12px">Get USDC payment details</button>
+          </div>
+        </div>
+        <ul class="steps">
+          <li class="done"><span class="b">✓</span> Private invoice created</li>
+          <li class="now" id="s2"><span class="b"></span> <span id="s2t">Waiting for your payment…</span></li>
+          <li id="s3"><span class="b"></span> Confirmed on Zcash — fully shielded</li>
+        </ul>
+        <p class="small muted" id="sync" style="text-align:left;margin-top:12px"></p>`;
+      document.getElementById('copy').onclick = () => navigator.clipboard.writeText(o.address);
+      document.querySelectorAll('.tab').forEach((t) => t.onclick = () => {
+        document.querySelectorAll('.tab').forEach((x) => x.classList.toggle('on', x === t));
+        for (const p of ['zecPane', 'usdcPane']) document.getElementById(p).classList.toggle('hide', p !== t.dataset.pane);
+      });
+      document.getElementById('usdcGo').onclick = async (e) => {
+        e.target.disabled = true; e.target.textContent = 'Getting a quote…';
+        try {
+          await api(`/api/orders/${id}/usdc`, { chain: document.getElementById('chain').value, refund_to: document.getElementById('refund').value.trim() });
+          renderUsdc(await api(`/api/orders/${id}`));
+        } catch (err) { alert(err.message); e.target.disabled = false; e.target.textContent = 'Get USDC payment details'; }
+      };
+      if (o.usdc) { document.querySelector('[data-pane=usdcPane]').click(); renderUsdc(o); }
+      document.getElementById('alt').onclick = (e) => {
+        const plain = e.target.dataset.plain !== '1';
+        e.target.dataset.plain = plain ? '1' : '0';
+        document.getElementById('qr').src = plain ? o.qr_address : o.qr;
+        e.target.textContent = plain ? `Address only — enter ${o.amount} ZEC yourself. Show full request` : "Wallet won't scan? Show address-only QR";
+      };
+      rendered = true;
+    }
+
+    const SWAP_TEXT = {
+      PENDING_DEPOSIT: 'Waiting for your USDC…',
+      KNOWN_DEPOSIT_TX: 'USDC received — swapping to ZEC…',
+      PROCESSING: 'Swapping to ZEC…',
+      SUCCESS: 'Swap done — confirming the shielded payment…',
+      INCOMPLETE_DEPOSIT: 'Deposit was short — send the rest.',
+      REFUNDED: 'Swap failed and your USDC was refunded.',
+      FAILED: 'Swap failed.',
+    };
+    function renderUsdc(o) {
+      const u = o.usdc;
+      if (!document.getElementById('usdcAddr')) {
+        document.getElementById('usdcBox').innerHTML = `
+          <div class="price" style="margin-top:12px">${esc(u.amount)} <small>USDC on ${esc(u.chain_name)}</small></div>
+          <img class="qr" src="${u.qr}" alt="USDC payment QR code">
+          <div class="addr mono" id="usdcAddr">${esc(u.deposit)}</div>
+          <div class="row" style="justify-content:center;margin-top:8px">
+            <button class="btn ghost" id="usdcCopy">Copy deposit address</button>
+          </div>
+          <p class="small muted">Send exactly this amount of USDC on <b>${esc(u.chain_name)}</b>. The quote holds for 30 minutes.</p>`;
+        document.getElementById('usdcCopy').onclick = () => navigator.clipboard.writeText(u.deposit);
+      }
+      document.getElementById('s2t').textContent = SWAP_TEXT[u.status] || u.status;
+    }
+
+    function renderPaid(o) {
+      const ret = params.get('return');
+      document.getElementById('box').innerHTML = `
+        <div class="paid-mark">✓</div>
+        <h2>Paid</h2>
+        <p class="muted">${o.paid} ZEC received for <b>${esc(o.label)}</b>${o.usdc ? ' (paid in USDC, settled shielded)' : ''}.<br>No one else can see who got paid.</p>
+        <div class="grid" style="margin-top:18px">
+          <a class="btn zec" href="/world/${o.id}">See what the world sees →</a>
+          ${ret ? `<a class="btn ghost" href="${esc(ret)}">Back to the shop</a>` : ''}
+        </div>
+        <p class="small muted" style="margin-top:14px">Block ${o.height ?? '—'}</p>`;
+      if (window.parent !== window) window.parent.postMessage({ type: 'zec-paid', order: o.id }, '*');
+    }
+
+    async function tick() {
+      try {
+        const [o, st] = await Promise.all([api(`/api/orders/${id}`), api('/api/status')]);
+        if (o.status === 'paid') return renderPaid(o);
+        if (!rendered) renderWaiting(o);
+        if (o.usdc) renderUsdc(o);
+        if (o.status === 'partial') {
+          document.getElementById('s2t').textContent = `Received ${o.paid} of ${o.amount} ZEC — send the rest to finish.`;
+        }
+        const el = document.getElementById('sync');
+        if (el) el.innerHTML = st.ok
+          ? `<span class="dot live"></span>&nbsp; Watching the chain · block ${st.tip ?? '…'} · checked ${ago(st.at)}<br>Payments show here once mined (about a minute).`
+          : `<span class="dot"></span>&nbsp; Connecting to Zcash…`;
+      } catch (e) {
+        document.getElementById('box').innerHTML = `<p>Order not found.</p>`;
+        return;
+      }
+      setTimeout(tick, 3000);
+    }
+    tick();
+  </script>
+</body>
+</html>
