@@ -6,7 +6,10 @@
   <title></title>
   <link rel="stylesheet" href="/style.css">
   <style>
-    .hero { text-align: center; padding: 30px 0 10px; }
+    .hero { text-align: center; padding: 40px 0 10px; position: relative; }
+    .hero::before { content: ''; position: absolute; inset: -120px -10% auto; height: 560px; background: radial-gradient(ellipse 60% 55% at 50% 40%, rgba(61, 107, 255, .22), transparent 70%); z-index: -1; pointer-events: none; }
+    .grad { background: linear-gradient(90deg, #9db8ff, #5d86ff 55%, #a8b8ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .tile svg { color: var(--violet-soft); }
     .hero h1 { max-width: 880px; margin: 22px auto 18px; }
     .hero p { max-width: 640px; margin: 0 auto; font-size: 18px; }
     .hero .row { justify-content: center; margin: 30px 0 0; }
@@ -47,12 +50,11 @@
   <header id="top"></header>
   <main class="wrap">
     <section class="hero">
-      <span class="tag">Private invoices on Zcash</span>
-      <h1>Your wallet is your bank statement.<br><span class="hl">Stop publishing it.</span></h1>
-      <p class="muted">Invoice links for crypto freelancers, anon devs and contributors. DAOs and clients pay in ZEC — or USDC from any chain. You receive shielded ZEC. Etherscan, Arkham and your next client see nothing.</p>
+      <h1>Your wallet is your bank statement.<br><span class="grad">Stop publishing it.</span></h1>
+      <p class="muted">Invoice links for crypto freelancers, anon devs and contributors. DAOs and clients pay in ZEC — or USDC from any chain. You receive shielded ZEC. Block explorers, wallet trackers and your next client see nothing.</p>
       <div class="row">
         <a class="btn" href="/dashboard">Create an invoice</a>
-        <a class="btn ghost" href="/world/demo">See what Arkham sees</a>
+        <a class="btn ghost" href="/world/demo">See what the public sees</a>
       </div>
     </section>
 

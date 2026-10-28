@@ -52,8 +52,7 @@ h3 { font-size: 18px; margin: 0 0 6px; letter-spacing: -0.01em; font-weight: 600
 .mono { font-family: var(--mono); font-size: 12.5px; word-break: break-all; }
 .eyebrow { font-size: 13px; color: var(--muted); display: inline-flex; align-items: center; gap: 8px; font-weight: 500; }
 .eyebrow .n { background: var(--card-2); color: var(--ink); border-radius: 8px; padding: 1px 8px; font-weight: 600; }
-.tag { font-size: 13px; font-weight: 500; background: var(--card); border: 1px solid var(--line); color: var(--ink); padding: 6px 14px; border-radius: 99px; display: inline-flex; align-items: center; gap: 8px; }
-.tag::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--violet-soft); }
+.tag { font-size: 14px; font-weight: 500; color: var(--muted); display: inline-block; }
 
 /* Surfaces */
 .card { background: var(--card); border-radius: var(--radius); padding: 26px; }

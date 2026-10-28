@@ -8,19 +8,19 @@
   <style>
     .cols { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-top: 20px; }
     .k { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; margin-top: 12px; }
-    .v { font-weight: 600; word-break: break-all; }
+    .v { font-weight: 500; word-break: break-word; }
     .hidden { font-family: var(--mono); color: var(--muted); letter-spacing: .1em; }
-    .leak { color: var(--bad); }
+    .leak { color: #f0b37e; }
     .tag { font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 99px; display: inline-block; }
     .tag.you { background: var(--ok-bg); color: var(--ok); }
     .tag.world { background: var(--line); color: var(--ink); }
-    .tag.public { background: var(--bad-bg); color: var(--bad); }
+    .tag.public { background: #3a2a17; color: #f0b37e; }
   </style>
 </head>
 <body>
   <header id="top"></header>
   <main class="wrap">
-    <h1>What Arkham sees.</h1>
+    <h1>What the public sees.</h1>
     <p class="muted" style="max-width:680px">Every DAO payout is a public label waiting to happen: who paid you, how much, and where it went next. Here's the same invoice three ways.</p>
     <div class="cols" id="cols"><p class="muted">Loading…</p></div>
   </main>
@@ -61,7 +61,7 @@
           <div class="k">To</div><div class="v leak">0xanon <span class="mono small">${fakeAddr('anon')}</span> · tagged <i>Contributor</i></div>
           <div class="k">Amount</div><div class="v leak">${esc(o.label)} — 12,000 USDC</div>
           <div class="k">Anyone can now see</div>
-          <div class="v leak">Total received from DAOs: $84,200. Every client, your rate, your balance, and the CEX you cash out to — enough to link 0xanon to a real name.</div>
+          <div class="v leak">Total received from DAOs: $84,200. Every client, your rate, your balance, and the exchange you cash out to — enough to link 0xanon to a real name.</div>
           <p class="small muted" style="margin-top:14px">Illustration of what block explorers and analytics tools show for a typical transparent payment.</p>
         </div>`;
     })().catch(() => { document.getElementById('cols').innerHTML = '<p>Order not found.</p>'; });
